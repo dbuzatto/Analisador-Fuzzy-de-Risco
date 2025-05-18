@@ -1,0 +1,1 @@
+# Analisador-Fuzzy-de-Risco
