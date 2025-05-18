@@ -3,7 +3,6 @@ import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import tkinter as tk
 from tkinter import ttk, messagebox
-from PIL import Image, ImageTk
 
 idade = ctrl.Antecedent(np.arange(0, 101, 1), 'idade')
 imc = ctrl.Antecedent(np.arange(10, 50, 0.1), 'imc')
@@ -54,14 +53,11 @@ class App:
         self.root = root
         self.root.title("Sistema Fuzzy - Risco de Saúde")
         self.is_dark = False
-
         self.main_frame = ttk.Frame(root, padding=20)
         self.main_frame.pack(fill='both', expand=True)
-
         self.toggle_icon = tk.Button(self.main_frame, command=self.toggle_theme)
         self.toggle_icon.pack(anchor='ne')
         self.set_icon()
-
         self.inputs = {}
         campos = [
             ("Idade (anos)", "Informe sua idade em anos completos."),
@@ -69,7 +65,6 @@ class App:
             ("Glicemia (mg/dL)", "Verifique esse valor em um exame de sangue em jejum."),
             ("Pressão Arterial Sistólica (PAS)", "Use o valor maior de sua pressão, ex: 120 se for 120/80."),
         ]
-
         for label_text, descricao in campos:
             label = ttk.Label(self.main_frame, text=label_text)
             label.pack(anchor='w', pady=(10, 0))
@@ -78,13 +73,10 @@ class App:
             descricao_label = ttk.Label(self.main_frame, text=descricao, style='Desc.TLabel', wraplength=400)
             descricao_label.pack(anchor='w')
             self.inputs[label_text] = entry
-
         self.resultado = ttk.Label(self.main_frame, text="", font=("Arial", 12, "bold"))
         self.resultado.pack(pady=20)
-
         self.botao = ttk.Button(self.main_frame, text="Calcular Riscos", command=self.calcular)
         self.botao.pack(pady=10)
-
         self.apply_theme()
 
     def set_icon(self):
@@ -121,17 +113,13 @@ class App:
             imc_val = float(self.inputs["IMC"].get())
             glicemia_val = float(self.inputs["Glicemia (mg/dL)"].get())
             pas_val = float(self.inputs["Pressão Arterial Sistólica (PAS)"].get())
-
             sistema.input['idade'] = idade_val
             sistema.input['imc'] = imc_val
             sistema.input['glicemia'] = glicemia_val
             sistema.input['pas'] = pas_val
-
             sistema.compute()
-
             risco_diab = sistema.output['risco_diabetes']
             risco_hiper = sistema.output['risco_hipertensao']
-
             self.resultado.config(text=f"Risco de Diabetes: {risco_diab:.1f}%\nRisco de Hipertensão: {risco_hiper:.1f}%")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao calcular: {e}")
