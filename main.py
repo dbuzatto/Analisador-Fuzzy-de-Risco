@@ -58,21 +58,28 @@ class App:
         self.toggle_icon = tk.Button(self.main_frame, command=self.toggle_theme)
         self.toggle_icon.pack(anchor='ne')
         self.set_icon()
+
+        # Validações para os campos
+        vcmd_idade = (root.register(self.validate_idade), '%P')
+        vcmd_float = (root.register(self.validate_float), '%P')
+
         self.inputs = {}
         campos = [
-            ("Idade (anos)", "Informe sua idade em anos completos."),
-            ("IMC", "Índice de Massa Corporal. Use peso (kg) / altura (m²)."),
-            ("Glicemia (mg/dL)", "Verifique esse valor em um exame de sangue em jejum."),
-            ("Pressão Arterial Sistólica (PAS)", "Use o valor maior de sua pressão, ex: 120 se for 120/80."),
+            ("Idade (anos)", "Informe sua idade em anos completos.", vcmd_idade),
+            ("IMC", "Índice de Massa Corporal. Use peso (kg) / altura (m²).", vcmd_float),
+            ("Glicemia (mg/dL)", "Verifique esse valor em um exame de sangue em jejum.", vcmd_float),
+            ("Pressão Arterial Sistólica (PAS)", "Use o valor maior de sua pressão, ex: 120 se for 120/80.", vcmd_float),
         ]
-        for label_text, descricao in campos:
+
+        for label_text, descricao, vcmd in campos:
             label = ttk.Label(self.main_frame, text=label_text)
             label.pack(anchor='w', pady=(10, 0))
-            entry = tk.Entry(self.main_frame)
+            entry = tk.Entry(self.main_frame, validate='key', validatecommand=vcmd)
             entry.pack(fill='x')
             descricao_label = ttk.Label(self.main_frame, text=descricao, style='Desc.TLabel', wraplength=400)
             descricao_label.pack(anchor='w')
             self.inputs[label_text] = entry
+
         self.resultado = ttk.Label(self.main_frame, text="", font=("Arial", 12, "bold"))
         self.resultado.pack(pady=20)
         self.botao = ttk.Button(self.main_frame, text="Calcular Riscos", command=self.calcular)
@@ -107,20 +114,71 @@ class App:
             self.botao.configure(style="Custom.TButton")
             style.configure("Custom.TButton", background='white', foreground='black')
 
+    def validate_idade(self, new_value):
+        if new_value == "":
+            return True
+        if new_value.isdigit():
+            valor = int(new_value)
+            return 0 < valor <= 100
+        return False
+
+    def validate_float(self, new_value):
+        if new_value == "":
+            return True
+        try:
+            # Permite um único ponto decimal
+            if new_value.count('.') > 1:
+                return False
+            float(new_value)
+            return True
+        except ValueError:
+            return False
+
     def calcular(self):
         try:
-            idade_val = float(self.inputs["Idade (anos)"].get())
-            imc_val = float(self.inputs["IMC"].get())
-            glicemia_val = float(self.inputs["Glicemia (mg/dL)"].get())
-            pas_val = float(self.inputs["Pressão Arterial Sistólica (PAS)"].get())
+            idade_text = self.inputs["Idade (anos)"].get()
+            imc_text = self.inputs["IMC"].get()
+            glicemia_text = self.inputs["Glicemia (mg/dL)"].get()
+            pas_text = self.inputs["Pressão Arterial Sistólica (PAS)"].get()
+
+            if not idade_text:
+                raise ValueError("Idade é obrigatória.")
+            idade_val = int(idade_text)
+            if idade_val <= 0 or idade_val > 100:
+                raise ValueError("Idade deve ser um número entre 1 e 100.")
+
+            if not imc_text:
+                raise ValueError("IMC é obrigatório.")
+            imc_val = float(imc_text)
+            if not (10 <= imc_val <= 50):
+                raise ValueError("IMC deve estar entre 10 e 50.")
+
+            if not glicemia_text:
+                raise ValueError("Glicemia é obrigatória.")
+            glicemia_val = float(glicemia_text)
+            if not (50 <= glicemia_val <= 300):
+                raise ValueError("Glicemia deve estar entre 50 e 300 mg/dL.")
+
+            if not pas_text:
+                raise ValueError("PAS é obrigatório.")
+            pas_val = float(pas_text)
+            if not (80 <= pas_val <= 200):
+                raise ValueError("PAS deve estar entre 80 e 200.")
+
             sistema.input['idade'] = idade_val
             sistema.input['imc'] = imc_val
             sistema.input['glicemia'] = glicemia_val
             sistema.input['pas'] = pas_val
             sistema.compute()
+
             risco_diab = sistema.output['risco_diabetes']
             risco_hiper = sistema.output['risco_hipertensao']
-            self.resultado.config(text=f"Risco de Diabetes: {risco_diab:.1f}%\nRisco de Hipertensão: {risco_hiper:.1f}%")
+
+            self.resultado.config(
+                text=f"Risco de Diabetes: {risco_diab:.1f}%\nRisco de Hipertensão: {risco_hiper:.1f}%"
+            )
+        except ValueError as ve:
+            messagebox.showerror("Erro", str(ve))
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao calcular: {e}")
 
