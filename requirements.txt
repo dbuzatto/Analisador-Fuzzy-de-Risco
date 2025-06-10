@@ -1,3 +1,5 @@
+streamlit
 numpy
+scipy
 scikit-fuzzy
-Pillow
+matplotlib
