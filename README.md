@@ -1,329 +1,130 @@
-# 🏥 Sistema Fuzzy para Diagnóstico de Diabetes e Hipertensão
+# Sistema Especialista Fuzzy para Apoio ao Diagnóstico Inicial de Diabetes e Hipertensão
 
-Um sistema especialista baseado em lógica fuzzy para avaliar riscos de diabetes e hipertensão a partir de parâmetros clínicos básicos.
+![Status do Projeto](https://img.shields.io/badge/status-ativo-brightgreen)
+![Licença](https://img.shields.io/badge/license-MIT-blue)
 
-## 📋 Índice
+## 🎯 Visão Geral do Projeto
 
-- [Visão Geral](#-visão-geral)
-- [Funcionalidades](#-funcionalidades)
-- [Dataset](#-dataset)
-- [Instalação](#-instalação)
-- [Como Usar](#-como-usar)
-- [Arquitetura do Sistema](#-arquitetura-do-sistema)
-- [Lógica Fuzzy](#-lógica-fuzzy)
-- [Tecnologias](#-tecnologias)
+Este projeto apresenta um **Sistema Especialista Fuzzy** desenvolvido para auxiliar no diagnóstico inicial de diabetes mellitus tipo 2 e hipertensão arterial. Utilizando a lógica fuzzy, o sistema processa variáveis clínicas simples (idade, Índice de Massa Corporal - IMC, glicemia e pressão arterial sistólica) para fornecer uma classificação de risco interpretável (baixo, médio e alto) para cada condição. O objetivo é oferecer uma ferramenta de apoio à triagem clínica, especialmente útil em ambientes com recursos limitados, onde o acesso a médicos especialistas pode ser restrito.
 
-## 🎯 Visão Geral
+O sistema foi implementado em Python, utilizando a biblioteca `scikit-fuzzy` para o motor de inferência Mamdani e `Streamlit` para a construção de uma interface web interativa e acessível.
 
-Este sistema utiliza **lógica fuzzy** para simular o raciocínio médico na avaliação de riscos de saúde. Diferente de sistemas binários (sim/não), a lógica fuzzy permite trabalhar com **incertezas** e **graduações** típicas do diagnóstico médico.
+## ✨ Recursos e Tecnologias
 
-### 🔬 Como Funciona
+* **Python**: Linguagem de programação principal.
+* **Scikit-fuzzy**: Biblioteca para implementação de sistemas de lógica fuzzy.
+* **Streamlit**: Framework para criação de aplicações web interativas com Python.
+* **NumPy**: Para operações numéricas eficientes.
+* **Matplotlib**: Para a visualização das funções de pertinência e ativações fuzzy.
 
-1. **Entrada**: Idade, IMC, Glicemia e Pressão Arterial
-2. **Processamento**: Inferência fuzzy com regras médicas
-3. **Saída**: Percentual de risco + categoria semântica (baixo/médio/alto)
+## 🚀 Instalação e Execução
 
-## ✨ Funcionalidades
+Siga os passos abaixo para configurar e executar o projeto em sua máquina local:
 
-- 📊 **Avaliação de Risco Dupla**: Diabetes e Hipertensão simultaneamente
-- 🎯 **Calibração Automática**: Adapta-se ao dataset fornecido
-- 🌡️ **Lógica Fuzzy**: Trabalha com incertezas e valores intermediários
-- 🎨 **Interface Intuitiva**: Streamlit com emojis e feedback visual
-- 📈 **Resultados Detalhados**: Percentual + categoria semântica
-- 🔄 **Fallback Inteligente**: Funciona mesmo sem dataset
+1.  **Clone o repositório:**
 
-## 📊 Dataset
+    ```bash
+    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+    cd seu-repositorio
+    ```
+    (Lembre-se de substituir `seu-usuario/seu-repositorio` pelo caminho real do seu repositório no GitHub.)
 
-### 🎯 **Papel Fundamental do Dataset**
+2.  **Crie um ambiente virtual (recomendado):**
 
-O dataset **NÃO é uma limitação**, mas sim o **calibrador** do sistema:
+    ```bash
+    python -m venv venv
+    ```
 
-```csv
-idade,imc,glicemia,pas
-22,20.5,75,105    # Jovem saudável
-45,32.0,125,145   # Adulto com fatores de risco
-70,34.0,160,175   # Idoso com risco elevado
-```
+3.  **Ative o ambiente virtual:**
 
-### 🔧 **Como o Dataset é Usado**
+    * **Windows:**
+        ```bash
+        .\venv\Scripts\activate
+        ```
+    * **macOS/Linux:**
+        ```bash
+        source venv/bin/activate
+        ```
 
-#### 1. **Calibração dos Universos Fuzzy**
+4.  **Instale as dependências:**
 
-```python
-# Dataset define os limites dos universos
-dados_dataset = np.loadtxt('dataset.csv', delimiter=',', skiprows=1)
-valores_idade, valores_imc, valores_glicemia, valores_pressao = dados_dataset.T
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-# Calcula estatísticas para posicionamento das funções
-estatisticas = {
-    'min':  np.min(valores),     # Limite inferior
-    'max':  np.max(valores),     # Limite superior
-    'mean': np.mean(valores),    # Centro das funções
-    'std':  np.std(valores)      # Dispersão
-}
-```
+5.  **Execute a aplicação Streamlit:**
 
-#### 2. **Posicionamento das Funções de Pertinência**
+    ```bash
+    streamlit run main.py
+    ```
 
-```python
-# Usa estatísticas para criar funções trapezoidais otimizadas
-parametros_baixo = [min, min, mean, mean + std]
-parametros_medio = [mean - std, mean, mean + std, mean + 2*std]
-parametros_alto = [mean, mean + std, max, max]
-```
-
-### 📈 **Estrutura do Dataset Atual**
-
-O dataset fornecido contém **109 registros** cobrindo:
-
-#### **👶 Jovens (18-30 anos)**
-
-```csv
-18,19.2,72,95     # Atleta jovem
-22,28.6,96,110    # Jovem normal
-28,18.5,68,90     # Jovem muito ativo
-```
-
-#### **👥 Adultos (30-50 anos)**
-
-```csv
-32,28.1,98,109    # Adulto saudável
-40,29.0,110,135   # Adulto normal
-45,32.0,125,145   # Pré-diabetes
-```
-
-#### **👴 Idosos (50-85 anos)**
-
-```csv
-55,42.0,195,175   # Alto risco diabetes
-70,34.0,160,175   # Risco moderado
-85,28.5,155,170   # Idoso controlado
-```
-
-#### **⚠️ Casos Especiais**
-
-```csv
-33,48.0,225,192   # Obesidade + diabetes severa
-24,16.8,65,85     # Subpeso + hipoglicemia
-80,27.4,84,80     # Idoso com pressão baixa
-```
-
-### 🎯 **Vantagens do Dataset Diversificado**
-
-#### ✅ **Com Dataset Abrangente:**
-
-- **Precisão**: Funções calibradas para população real
-- **Adaptabilidade**: Reconhece padrões específicos
-- **Robustez**: Lida bem com casos extremos
-- **Confiabilidade**: Diagnósticos mais assertivos
-
-#### 🔄 **Sem Dataset (Fallback):**
-
-```python
-# Dados genéricos para demonstração
-valores_idade = np.array([25, 30, 45, 60, 70])
-valores_imc = np.array([18.5, 25, 30, 35, 40])
-valores_glicemia = np.array([80, 100, 120, 140, 180])
-valores_pressao = np.array([90, 120, 140, 160, 180])
-```
-
-### 🔍 **Dataset vs Entrada do Usuário**
-
-| Aspecto           | Dataset                | Entrada do Usuário      |
-| ----------------- | ---------------------- | ----------------------- |
-| **Função**        | Calibração do sistema  | Dados para diagnóstico  |
-| **Momento**       | Inicialização          | Runtime                 |
-| **Limitações**    | Define otimização      | Limitada pela interface |
-| **Flexibilidade** | Fixa após carregamento | Qualquer valor válido   |
-
-**Exemplo:** Dataset com idades 18-85, mas usuário pode inserir qualquer idade entre 1-120 anos!
-
-## 🚀 Instalação
-
-### Pré-requisitos
-
-```bash
-python >= 3.8
-pip >= 21.0
-```
-
-### Dependências
-
-```bash
-pip install numpy
-pip install scikit-fuzzy
-pip install streamlit
-```
-
-### Executar Aplicação
-
-```bash
-streamlit run main.py
-```
+    Isso abrirá a aplicação em seu navegador web padrão (geralmente em `http://localhost:8501`).
 
 ## 🖥️ Como Usar
 
-### 1. **Iniciar o Sistema**
+A interface do Streamlit permite que você insira os valores das variáveis clínicas:
 
-```bash
-streamlit run main.py
-```
+* **Idade** (anos)
+* **IMC** (kg/m²)
+* **Glicemia** (mg/dL)
+* **Pressão Sistólica** (mmHg)
 
-### 2. **Inserir Dados Clínicos**
+Após inserir os dados, clique no botão "Calcular Riscos" para obter a avaliação de risco de diabetes e hipertensão, apresentada em percentuais e classificações linguísticas (Baixo, Médio, Alto). O sistema também exibe gráficos das funções de pertinência e o processo de fuzzificação, que ajudam a entender como o sistema chegou aos resultados.
 
-- 👤 **Idade**: 1-120 anos
-- ⚖️ **IMC**: 10.0-50.0 kg/m²
-- 🩸 **Glicemia**: 50-300 mg/dL
-- 💓 **Pressão Sistólica**: 70-220 mmHg
+## 📊 Resultados e Exemplos
 
-### 3. **Interpretar Resultados**
+O sistema foi testado com diferentes perfis de usuários para demonstrar seu comportamento:
 
-```
-🩺 Risco de Diabetes: 67.3%
-🔴 Alto
+### Exemplo 1 — Baixo Risco
 
-❤️ Risco de Hipertensão: 23.1%
-🟢 Baixo
-```
+* **Dados de Entrada:** Idade: 21 anos; IMC: 26; Glicemia: 100 mg/dL; PAS: 90 mmHg
+* **Resultados:** Risco de Diabetes: 20.0%; Risco de Hipertensão: 20.0%
 
-#### 🎨 **Códigos de Cores**
+[Image of Interface do sistema fuzzy - Baixo Risco]
 
-- 🟢 **Verde**: Risco Baixo (0-40%)
-- 🟡 **Amarelo**: Risco Médio (30-70%)
-- 🔴 **Vermelho**: Risco Alto (60-100%)
+### Exemplo 2 — Médio Risco
 
-## 🧠 Arquitetura do Sistema
+* **Dados de Entrada:** Idade: 62 anos; IMC: 32.1; Glicemia: 50 mg/dL; PAS: 114 mmHg
+* **Resultados:** Risco de Diabetes: 56.6%; Risco de Hipertensão: 54.1%
 
-### 📊 **Fluxo de Dados**
+[Image of Interface do sistema fuzzy - Médio Risco]
 
-```mermaid
-Dataset CSV → Estatísticas → Universos Fuzzy → Funções de Pertinência
-                                                        ↓
-Entrada Usuário → Fuzzificação → Regras → Inferência → Defuzzificação → Resultado
-```
+### Exemplo 3 — Alto Risco
 
-### 🔧 **Componentes Principais**
+* **Dados de Entrada:** Idade: 70 anos; IMC: 34.0; Glicemia: 160 mg/dL; PAS: 175 mmHg
+* **Resultados:** Risco de Diabetes: 65.0%; Risco de Hipertensão: 65.8%
 
-#### 1. **Processamento de Dados**
+[Image of Interface do sistema fuzzy - Alto Risco]
 
-```python
-carregar_dados_clinicos()           # Carrega dataset ou fallback
-calcular_estatisticas_parametros()  # Min, max, média, desvio
-```
+### Processo de Fuzzificação
 
-#### 2. **Sistema Fuzzy**
+Este gráfico mostra como os valores de entrada são convertidos em graus de pertinência fuzzy:
 
-```python
-criar_variaveis_entrada()           # Antecedentes (idade, imc, etc.)
-criar_variaveis_saida()            # Consequentes (riscos)
-configurar_funcoes_pertinencia()   # Baixo, médio, alto
-criar_regras_inferencia()          # Lógica médica
-```
+[Image of Processo de Fuzzificação]
 
-#### 3. **Interface**
+## 📁 Estrutura do Projeto
 
-```python
-criar_interface_usuario()          # Streamlit UI
-processar_avaliacao_risco()       # Engine principal
-exibir_resultados()               # Resultados formatados
-```
-
-## 🎯 Lógica Fuzzy
-
-### 📏 **Funções de Pertinência**
-
-#### **Variáveis de Entrada (Trapezoidais)**
-
-```python
-# Baseadas nas estatísticas do dataset
-baixo = [min, min, mean, mean + std]
-medio = [mean - std, mean, mean + std, mean + 2*std]
-alto = [mean, mean + std, max, max]
-```
-
-#### **Variáveis de Saída (Triangulares)**
-
-```python
-risco_baixo = [0, 20, 40]      # 0-40%
-risco_medio = [30, 50, 70]     # 30-70%
-risco_alto = [60, 80, 100]     # 60-100%
-```
-
-### 🧩 **Regras de Inferência**
-
-#### **Para Diabetes:**
-
-```python
-SE (glicemia ALTA OU imc ALTO OU idade ALTA) ENTÃO risco_diabetes ALTO
-SE (glicemia MÉDIA E imc MÉDIO) ENTÃO risco_diabetes MÉDIO
-SE (glicemia BAIXA E idade BAIXA) ENTÃO risco_diabetes BAIXO
-```
-
-#### **Para Hipertensão:**
-
-```python
-SE (pressão ALTA OU idade ALTA OU imc ALTO) ENTÃO risco_hipertensao ALTO
-SE (pressão MÉDIA E idade MÉDIA) ENTÃO risco_hipertensao MÉDIO
-SE (pressão BAIXA E idade BAIXA) ENTÃO risco_hipertensao BAIXO
-```
-
-### ⚙️ **Processo de Inferência**
-
-1. **Fuzzificação**: Converte valores crisp em graus de pertinência
-2. **Avaliação de Regras**: Aplica operadores fuzzy (E, OU)
-3. **Agregação**: Combina resultados de múltiplas regras
-4. **Defuzzificação**: Converte resultado fuzzy em valor crisp
-
-## 🛠️ Tecnologias
-
-| Tecnologia       | Versão | Função              |
-| ---------------- | ------ | ------------------- |
-| **Python**       | 3.8+   | Linguagem principal |
-| **NumPy**        | Latest | Computação numérica |
-| **scikit-fuzzy** | Latest | Lógica fuzzy        |
-| **Streamlit**    | Latest | Interface web       |
-
-## 📝 Estrutura de Arquivos
-
-```
-sistema-fuzzy-diagnostico/
-├── main.py              # Aplicação principal
-├── dataset.csv          # Dados para calibração (109 registros)
-├── README.md           # Este arquivo
-└── requirements.txt    # Dependências
-```
-
-## 🔬 Validação Médica
-
-### ⚠️ **Disclaimer Importante**
-
-Este sistema é para **fins educacionais e demonstrativos**. Não substitui:
-
-- Consulta médica profissional
-- Exames laboratoriais completos
-- Diagnóstico clínico especializado
-
-### 🎯 **Uso Recomendado**
-
-- Triagem inicial
-- Educação em saúde
-- Demonstração de IA em medicina
-- Pesquisa acadêmica
+* `main.py`: O código-fonte principal da aplicação Streamlit, contendo a lógica fuzzy e a interface.
+* `dataset.csv`: (Opcional) Arquivo de dados utilizado para carregar exemplos ou definir o universo de discurso das variáveis fuzzy.
+* `requirements.txt`: Lista de todas as dependências do Python necessárias para o projeto.
+* `images/`: Pasta contendo as imagens utilizadas no README e possivelmente no documento LaTeX.
 
 ## 🤝 Contribuição
 
-Contribuições são bem-vindas! Por favor:
+Contribuições são bem-vindas! Se você quiser melhorar este projeto, por favor:
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+1.  Faça um fork do repositório.
+2.  Crie uma branch para sua feature (`git checkout -b feature/minha-nova-feature`).
+3.  Faça suas alterações e commit (`git commit -m 'feat: adiciona nova funcionalidade'`).
+4.  Envie para o branch original (`git push origin feature/minha-nova-feature`).
+5.  Abra um Pull Request.
 
 ## 📄 Licença
 
-Este projeto está sob licença MIT. Veja o arquivo LICENSE para detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
----
+## 👨‍💻 Autores
 
-**Desenvolvido com ❤️ para educação em IA médica**
+* **Diogo Buzatto** - `diogobuzatto@alunos.fho.edu.br`
+* **Lucas Ferreira Silva** - `lucas.silva2958@alunos.fho.edu.br`
+
