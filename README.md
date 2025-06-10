@@ -29,30 +29,13 @@ Siga os passos abaixo para configurar e executar o projeto em sua máquina local
     ```
     (Lembre-se de substituir `seu-usuario/seu-repositorio` pelo caminho real do seu repositório no GitHub.)
 
-2.  **Crie um ambiente virtual (recomendado):**
-
-    ```bash
-    python -m venv venv
-    ```
-
-3.  **Ative o ambiente virtual:**
-
-    * **Windows:**
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    * **macOS/Linux:**
-        ```bash
-        source venv/bin/activate
-        ```
-
-4.  **Instale as dependências:**
+2.  **Instale as dependências:**
 
     ```bash
     pip install -r requirements.txt
     ```
 
-5.  **Execute a aplicação Streamlit:**
+3.  **Execute a aplicação Streamlit:**
 
     ```bash
     streamlit run main.py
@@ -119,12 +102,7 @@ Contribuições são bem-vindas! Se você quiser melhorar este projeto, por favo
 4.  Envie para o branch original (`git push origin feature/minha-nova-feature`).
 5.  Abra um Pull Request.
 
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
 ## 👨‍💻 Autores
 
 * **Diogo Buzatto** - `diogobuzatto@alunos.fho.edu.br`
 * **Lucas Ferreira Silva** - `lucas.silva2958@alunos.fho.edu.br`
-
