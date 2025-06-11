@@ -98,7 +98,7 @@ Este gráfico mostra como os valores de entrada são convertidos em graus de per
 * `main.py`: O código-fonte principal da aplicação Streamlit, contendo a lógica fuzzy e a interface.
 * `dataset.csv`: (Opcional) Arquivo de dados utilizado para carregar exemplos ou definir o universo de discurso das variáveis fuzzy.
 * `requirements.txt`: Lista de todas as dependências do Python necessárias para o projeto.
-* `images/`: Pasta contendo as imagens utilizadas no README e possivelmente no documento LaTeX.
+* `images/`: Pasta contendo as imagens utilizadas no LaTeX.
 
 ## 🤝 Contribuição
 
