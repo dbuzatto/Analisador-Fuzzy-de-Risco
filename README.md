@@ -35,7 +35,15 @@ Siga os passos abaixo para configurar e executar o projeto em sua máquina local
     pip install -r requirements.txt
     ```
 
-3.  **Execute a aplicação Streamlit:**
+3. **Execute a aplicação Streamlit:**
+
+    Forma recomendada (funciona mesmo se `streamlit` não estiver no PATH):
+
+    ```bash
+    python -m streamlit run main.py
+    ```
+
+    *(Opcional) Se o comando `streamlit` estiver disponível no seu sistema:*
 
     ```bash
     streamlit run main.py
